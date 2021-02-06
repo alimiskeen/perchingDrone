@@ -52,10 +52,8 @@ void loop() // -------------------------------------- Loop
   switch ( message )
   {
   case '1': 
-    closePerchingMechanism(); 
     break;
   case '2': 
-    openPerchingMechanism(); 
     break; 
   case '3': 
   // Open Coil 
@@ -91,18 +89,6 @@ char getTraffic( )
     
 }
 
-void openPerchingMechanism( ) 
-{
-  // TO DO 
-  
-}
-
-void closePerchingMechanism( ) 
-{
-  // TO DO 
-  
-}
-
 void actuateCoil(int Direction) 
 {
   // Enable the motor controller 
@@ -124,7 +110,6 @@ void actuateCoil(int Direction)
     dirB = 1; 
   }
 
-
   // Turn the motors on in the respective direction
   digitalWrite(coil_Motor_Dir_PinA, dirA); 
   digitalWrite(coil_Motor_Dir_PinB, dirB); 
@@ -135,24 +120,22 @@ void actuateCoil(int Direction)
 
 
   // Monitor the encoder, when the shaft stalls kill the motor power
-  int d_dt = 3; // the derivative of the motor speed
-  while ( d_dt > 1 ) 
+  int d_dt = 1000; // the derivative of the motor speed, high number just to get in the loop 
+  while ( d_dt > 420 ) 
   {
     // Calculate the derivative of encoder counts 
     int v1 = 10*coilEnc.read();  
     delay(10); 
     int v2 = 10*coilEnc.read();  
     d_dt = abs(v2-v1); 
-    
+
+
+    //Serial.println(d_dt); 
   }
 
   // Debug message
-  #ifdef showDebugMess 
-    Serial.println("The motor has stalled and exited"); 
-  #endif
-
-  
-
+  Serial.println("The motor has stalled and exited"); 
+ 
   // Shut the motor off
   analogWrite(coil_Motor_Speed_Pin, 0); 
 
@@ -160,5 +143,3 @@ void actuateCoil(int Direction)
   digitalWrite(coil_Motor_Enable, LOW); 
 
 }
-
-

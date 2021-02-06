@@ -127,7 +127,7 @@ void actuateCoil(int Direction)
   int d_dt2 = 10000; // the derivative of the motor speed
 
 
-  while ( (d_dt1 > 30) && (d_dt2 > 30) )
+  while ( (d_dt1 > 20)  )
   {
     // Calculate the derivative of encoder counts
     //VA1 is side 1 motor initial read
@@ -140,10 +140,10 @@ void actuateCoil(int Direction)
     // Calculate the derivative of the motors to detect stall 
     d_dt1 = abs(vA1+ (10*coilEnc1.read()) ) / 50;
     d_dt2 = abs(vA2- (10*coilEnc2.read()) ) / 50; 
-    // Serial.print(d_dt1);
-    // Serial.print("  "); 
-    // Serial.print(d_dt2);
-    // Serial.print("\t"); 
+    //Serial.print(d_dt1);
+    //Serial.print("  "); 
+    //Serial.print(d_dt2);
+    //Serial.print("\t"); 
 
     // Proportional controller error calculation
     int error1 = vA1 - vA2;
