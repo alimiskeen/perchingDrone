@@ -2,25 +2,47 @@
 
 import tkinter as tk
 import rospy
+from perchingDrone.msg import core_command, hook_command, hook_status
+import threading
 
 
 def open_core():
     # send rospy message
+    msg = core_command()
+    msg.open = True
+    msg.close = False
+
+    core_commander.publish(msg)
     print('open core')
 
 
 def open_hook():
     # send rospy message
+    msg = hook_command()
+    msg.open = True
+    msg.close = False
+
+    hook_commander.publish(msg)
     print('open hook')
 
 
 def close_core():
     # send rospy message
+    msg = core_command()
+    msg.open = False
+    msg.close = True
+
+    core_commander.publish(msg)
     print('close core')
 
 
 def close_hook():
     # send rospy message
+    msg = hook_command()
+    msg.open = False
+    msg.close = True
+
+    hook_commander.publish(msg)
     print('close hook')
 
 
@@ -48,15 +70,17 @@ def setup_window(root, frame):
     hook_close.grid(row=3, column=1)
 
 
-def status_updater():
+def status_updater(message: hook_status):
     # read rospy message
-
-    if True:
-        core_status.config(text='Closed', fg='red')
-        hook_status.config(text='Closed', fg='red')
-    else:
-        core_status.config(text='Open', fg='green')
+    if message.hook_open:
         hook_status.config(text='Open', fg='green')
+    else:
+        hook_status.config(text='Closed', fg='red')
+
+    if message.core_open:
+        core_status.config(text='Open', fg='green')
+    else:
+        core_status.config(text='Closed', fg='red')
 
 
 def app():
@@ -72,11 +96,21 @@ def app():
     root.mainloop()
 
 
+def status_listener():
+    status_topic = rospy.Subscriber('status_topic', hook_status, status_updater)
+    rospy.spin()
+
+
 if __name__ == '__main__':
-    rospy.init_node('GUI', anonymous=True)
+    rospy.init_node('GUI')
 
-    # link updater to the topic
+    # listener topic
+    update_thread = threading.Thread(target=status_listener)
+    update_thread.start()
 
+    # publisher topics
+    hook_commander = rospy.Publisher('hook_commander', hook_command, queue_size=5)
+    core_commander = rospy.Publisher('core_commander', core_command, queue_size=5)
 
-
+    # start the gui
     app()

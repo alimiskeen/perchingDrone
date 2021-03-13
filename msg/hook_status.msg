@@ -1,2 +1,2 @@
-bool hook
-bool core
+bool hook_open
+bool core_open
