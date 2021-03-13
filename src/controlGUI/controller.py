@@ -19,7 +19,7 @@ def status_sender():
 
 
 def listen_hook_commander():
-    hook_topic = rospy.Subscriber('hook_commander', hook_status, hook_message)
+    hook_topic = rospy.Subscriber('hook_commander', hook_command, hook_message)
     rospy.spin()
 
 
@@ -54,7 +54,7 @@ def open_hook():
 
 
 def listen_core_commander():
-    core_topic = rospy.Subscriber('core_commander', hook_status, core_message)
+    core_topic = rospy.Subscriber('core_commander', core_command, core_message)
     rospy.spin()
 
 
