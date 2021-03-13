@@ -38,6 +38,7 @@ def close_hook():
     global status_changed
     # send arduino command
 
+    print('close hook')  # remove this later
     is_hook_open = False
     status_changed = True
 
@@ -47,6 +48,7 @@ def open_hook():
     global status_changed
     # send arduino command
 
+    print('open hook')  # remove this later
     is_hook_open = True
     status_changed = True
 
@@ -71,6 +73,7 @@ def close_core():
     global status_changed
     # send arduino command
 
+    print('close core')  # remove this later
     is_core_open = False
     status_changed = True
 
@@ -80,6 +83,7 @@ def open_core():
     global status_changed
     # send arduino command
 
+    print('open core')  # remove this later
     is_core_open = True
     status_changed = True
 
