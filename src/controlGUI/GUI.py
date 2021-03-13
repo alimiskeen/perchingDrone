@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import tkinter as tk
+import rospy
 
 
 def open_core():
@@ -68,11 +69,14 @@ def app():
 
     setup_window(root, frame)
 
-
     root.mainloop()
 
 
 if __name__ == '__main__':
-    # rospy.init_node('GUI', anonymous=True)
+    rospy.init_node('GUI', anonymous=True)
+
     # link updater to the topic
+
+
+
     app()
