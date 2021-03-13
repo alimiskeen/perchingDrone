@@ -70,7 +70,7 @@ def setup_window(root, frame):
     hook_close.grid(row=3, column=1)
 
 
-def status_updater(message: hook_status):
+def status_updater(message):
     # read rospy message
     if message.hook_open:
         hook_status.config(text='Open', fg='green')
