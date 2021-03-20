@@ -3,6 +3,7 @@
 import rospy
 from perchingDrone.msg import core_command, hook_command, hook_status
 import threading
+from std_msgs.msg import String
 
 
 def status_sender():
@@ -37,6 +38,8 @@ def close_hook():
     global is_hook_open
     global status_changed
     # send arduino command
+    sendMessageToArduino('C103')
+
 
     print('close hook')  # remove this later
     is_hook_open = False
@@ -47,6 +50,7 @@ def open_hook():
     global is_hook_open
     global status_changed
     # send arduino command
+    sendMessageToArduino('C104')
 
     print('open hook')  # remove this later
     is_hook_open = True
@@ -103,3 +107,7 @@ if __name__ == '__main__':
 
     # sending status to gui thread
     status_sender()
+
+def sendMessageToArduino (message):
+    pub = rospy.Publisher('arduinocommands', String, queue_size=10)
+    pub.publish(message)

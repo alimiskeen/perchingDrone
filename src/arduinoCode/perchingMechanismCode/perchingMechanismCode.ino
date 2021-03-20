@@ -28,9 +28,8 @@
 Encoder coilEnc1(Motor_oneA, Motor_oneB);
 Encoder coilEnc2(Motor_twoA, Motor_twoB);
 
-//Encoder pins
-
-char message = '0';
+char message[4];
+int  coilCommand = 0; 
 
 void setup()
 {
@@ -52,40 +51,62 @@ void setup()
 
 } // end of Setup
 
+
 void loop()
 {
   
 
-  actuateCoil(1); 
-  delay(3000); 
-  actuateCoil(0); 
-  delay(3000); 
+//  actuateCoil(1); 
+//  delay(3000); 
+//  actuateCoil(0); 
+//  delay(3000); 
 
   // // Monitor Serial Line for Commands
-  // message = getTraffic();
+  if (Serial.available() > 3) {
+    getTraffic();
+
+    Serial.print(message);  
+  }
 
   // // Perform Motor actions when commands are recieved
-  // if (message == '6')
-  // {
-  //   actuateCoil(1);
-  // }
-  // else if (message == '7')
-  // {
-  //   actuateCoil(0);
-  // }
+  if (message[3] == '3')
+   {
+     actuateCoil(1);
+   }
+   else if (message[3] == '4')
+   {
+     actuateCoil(0);
+   }
 
+   message[0] = '0'; 
+   message[1] = '0'; 
+   message[2] = '0'; 
+   message[3] = '0';
+    
 } // end of loop
 
 char getTraffic()
 {
+     
   // TO DO: Add some resilience here.
-  if (Serial.available())
-  {
-    return Serial.read();
-  }
-  else
-  {
-    return '0';
+  if (Serial.available() > 3) {
+    message[0] = Serial.read(); 
+    Serial.println(message[0]); 
+    if ( message[0] == 'C') {
+      message[1] = Serial.read();
+      Serial.println(message[1]);       
+      if ( message[1] == '1') {
+        message[2] = Serial.read();
+        Serial.println(message[2]); 
+        if (message[2] == '0'){
+          message[3] = Serial.read();
+          Serial.println(message[3]);  
+          coilCommand = int(Serial.read()); 
+          
+        }
+      }
+    }
+    
   }
 }
 
