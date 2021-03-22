@@ -40,19 +40,27 @@ def listener(sercomm):
 def setupserialconnection(): 
    # List the available ports
    ports = serial.tools.list_ports_linux.comports()
-
-   #TODO figure out how to handle multiple arduinos 
+ 
    # Figure out which usb device is an arduino
-   for possdevice in ports:
-      if "arduino" in possdevice.manufacturer :
-         portName = possdevice.device
-
-   # Create the serial connection 
-   ardConn = serial.Serial(portName, 9600, timeout=1)
-
-   # This gives the arduino time to restart after the serial connection is created
-   time.sleep(1)
-   return ardConn
+   arduinoFound = False
+   for possdevice in ports: 
+      try: 
+         # Try to connect to the serial device 
+         connection = serial.Serial(possdevice.device, 9600, timeout = 1)
+         # Wait for arduino to reboot after connection and to send it's identifier message
+         time.sleep(3.0)
+         # Attemp to connect to read the arduinos message
+         tempMess = connection.read_all()
+         tempMess = tempMess.decode('utf-8')
+         if tempMess == 'gripper': 
+               arduinoFound = True
+               rospy.loginfo('Connected to arduino successfully')
+               return connection
+      except: 
+         rospy.loginfo("Unsuccessful connection device may not be the arduino")
+   if arduinoFound == False: 
+      rospy.loginfo("No arduino found in the com ports")
+      return 0
 
 
 if __name__ == '__main__':
