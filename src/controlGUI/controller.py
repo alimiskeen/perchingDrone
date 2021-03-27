@@ -5,6 +5,10 @@ from perchingDrone.msg import core_command, hook_command, hook_status
 import threading
 from std_msgs.msg import String
 
+def sendMessageToArduino (message):
+    pub = rospy.Publisher('arduinocommands', String, queue_size=10)
+    pub.publish(message)
+
 
 def status_sender():
     global status_changed
@@ -107,7 +111,3 @@ if __name__ == '__main__':
 
     # sending status to gui thread
     status_sender()
-
-def sendMessageToArduino (message):
-    pub = rospy.Publisher('arduinocommands', String, queue_size=10)
-    pub.publish(message)
