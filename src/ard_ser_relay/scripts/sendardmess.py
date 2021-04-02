@@ -4,6 +4,8 @@ from std_msgs.msg import String
 import serial
 import serial.tools.list_ports_linux
 import time
+from signal import signal, SIGINT
+from sys import exit
 
 # Ali you can just change this make this node listen to a different one
 # that way you don't need to worry about finding it 
@@ -12,7 +14,7 @@ nodeThisOneNeedsToListenTo = "arduinocommands"
 
 def callback(data):
    # put this in the log 
-   rospy.loginfo("sendardmess heard " + data.data)
+   rospy.loginfo(data.data + ' Was sent to Arduino')
 
    # Encode the data to a byte format 
    ardmessage = bytes(data.data, 'utf-8')
@@ -21,10 +23,10 @@ def callback(data):
    sercomm.write(ardmessage)
 
    # Get the response from the arduino 
-   messRecvd = sercomm.read_until('\n')
+   #messRecvd = sercomm.read_until('\n')
 
    # Put this in the log 
-   rospy.loginfo("The arduino heard " + messRecvd.decode('utf_8'))
+   #rospy.loginfo("The arduino heard " + messRecvd.decode('utf_8'))
 
 
 def listener(sercomm):
@@ -54,15 +56,22 @@ def setupserialconnection():
          tempMess = tempMess.decode('utf-8')
          if tempMess == 'gripper': 
                arduinoFound = True
-               rospy.loginfo('Connected to arduino successfully')
+               print('Connected to arduino successfully')
                return connection
       except: 
-         rospy.loginfo("Unsuccessful connection device may not be the arduino")
+         print("Unsuccessful connection device may not be the arduino")
    if arduinoFound == False: 
-      rospy.loginfo("No arduino found in the com ports")
+      print("No arduino found in the com ports")
       return 0
 
+def onClose(signal_recieved, frame): 
+   sercomm.close()
+   print("Closing the comm port to the arduino") 
+   exit(0)
 
 if __name__ == '__main__':
+   signal(SIGINT, onClose)
    sercomm = setupserialconnection()
    listener(sercomm)
+      
+

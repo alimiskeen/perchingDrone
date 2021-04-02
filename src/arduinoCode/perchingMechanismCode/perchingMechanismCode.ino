@@ -24,7 +24,10 @@
 #define Motor_twoA 2
 #define Motor_twoB 7
 
-// Enocder commands
+// Pin to tell the other Arduino what to do 
+#define coilFlagPin 13
+
+// Encoder object instantiation 
 Encoder coilEnc1(Motor_oneA, Motor_oneB);
 Encoder coilEnc2(Motor_twoA, Motor_twoB);
 
@@ -52,17 +55,17 @@ void setup()
   // Enable pin
   pinMode(enablePin, OUTPUT);
 
+  // Coil flag pin
+  pinMode(coilFlagPin, OUTPUT); 
+
+  // Open the core on startup 
+  digitalWrite(coilFlagPin, LOW); 
+
 } // end of Setup
 
 // ---------------------------------------------------------------------- loop()
 void loop()
 {
-
-
-//  actuateCoil(1);
-//  delay(3000);
-//  actuateCoil(0);
-//  delay(3000);
 
   // // Monitor Serial Line for Commands
   if (Serial.available() > 3) {
@@ -79,13 +82,16 @@ void loop()
     case '3':
       actuateCoil(1); break; 
     case '2':
-      // Send message to other arduino
+      // Close the Core
+      digitalWrite(A7, HIGH);  
       break; 
     case '1':
-      // Send message to other arduino
+      // Open the Core 
+      digitalWrite(A7, LOW); 
       break; 
     default: 
-      Serial.println("Recieved a Junk command, comm must be bad"); 
+      // Do nothing
+      break;
   }
 
   // Reset the message variable
