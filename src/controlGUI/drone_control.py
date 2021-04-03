@@ -7,6 +7,9 @@ from dronekit import connect, VehicleMode, LocationGlobal
 from perchingDrone.msg import drone_status, drone_commands
 import rospy
 import threading
+import geopy
+import geopy.distance
+import math
 
 connection_string = '/dev/ttyACM0'
 # Connect to the Vehicle.
@@ -56,7 +59,7 @@ def change_mode(mode):
 
 
 def arm_drone(arm):
-    vehicle.armed = arm
+    vehicle.arm()  # Arming my be some other way
 
 
 def set_airspeed(speed):
@@ -74,8 +77,20 @@ def land(do):
 
 
 def move(fwd, left):  # in m/s
-    # TODO: change distanse to lon and lat
-    target_location = LocationGlobal(-40.0000, 111.225146, vehicle.location.global_frame.alt)
+    start = geopy.Point(latitude=vehicle.location.global_frame.lat, longitude=vehicle.location.global_frame.lon)
+
+    d = geopy.distance.distance(kilometers=(abs(fwd) + abs(left)) / 1000)
+
+    if fwd > 0:
+        final = d.destination(point=start, bearing=vehicle.heading)
+    elif fwd < 0:
+        final = d.destination(point=start, bearing=(vehicle.heading + 180) % 360)
+    elif left > 0:
+        final = d.destination(point=start, bearing=(vehicle.heading + 90) % 360)
+    else:
+        final = d.destination(point=start, bearing=(vehicle.heading + 90) % 360)
+
+    target_location = LocationGlobal(final.latitude, final.longitude, vehicle.location.global_frame.alt)
     vehicle.simple_goto(target_location)
 
 
