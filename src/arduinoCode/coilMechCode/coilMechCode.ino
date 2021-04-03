@@ -10,21 +10,26 @@
 #include <Encoder.h>
 
 //----------------------------------------------------- Pin Declarations 
-#define coil_Motor_Speed_Pin 6
-#define coil_Motor_Dir_PinA  7
-#define coil_Motor_Dir_PinB  8
-#define coil_Motor_Enc_PinA 3
-#define coil_Motor_Enc_PinB 4 
-#define coil_Motor_Enable 10
+#define coil_Motor_Speed_Pin  6
+#define coil_Motor_Dir_PinA   7
+#define coil_Motor_Dir_PinB   8
+#define coil_Motor_Enc_PinA   3
+#define coil_Motor_Enc_PinB   4 
+#define coil_Motor_Enable     10
+#define commandPin A7
 
 //----------------------------------------------------- Global variables  
 bool showDebugMess = true; 
-char message = "0"; 
+bool coilIsOpen = false;
+
 
 // ---------------------------------------------------- Function Declarations 
 
 // Attach the encoder 
 Encoder coilEnc(coil_Motor_Enc_PinA, coil_Motor_Enc_PinB); 
+
+char message[4] = {'0','0','0','0'};
+int  coilCommand = 0;
 
 void setup() //--------------------------------------- Setup 
 {
@@ -36,58 +41,51 @@ void setup() //--------------------------------------- Setup
  pinMode(coil_Motor_Dir_PinA,  OUTPUT); 
  pinMode(coil_Motor_Dir_PinB,  OUTPUT);
  pinMode(coil_Motor_Enable, OUTPUT); 
+ pinMode(commandPin, INPUT); 
 
+  // Make sure the coil starts in the open position 
+  //actuateCoil(0);
+  //coilIsOpen = true;  
+ 
 }
 
 
 void loop() // -------------------------------------- Loop 
 {
 
-  
-  // Monitor Serial Line for Commands 
-  message = getTraffic();
+  // Monitor the command pin 
+  int coilPinState = analogRead(commandPin); 
+  delay(200); 
 
-  // Perform Motor actions when commands are recieved
-  // TO DO determine the final commands  
-  switch ( message )
-  {
-  case '1': 
-    break;
-  case '2': 
-    break; 
-  case '3': 
-  // Open Coil 
-    actuateCoil(1);
-    break;
-  case '4': 
-  // Close Coil 
-    actuateCoil(0); 
-    break; 
-  default:
-    // Do nothing because we have earned it. 
-    break;
-  }
-  
-  
+  Serial.print("CoilPinState: "); 
+  Serial.print(coilPinState);
+  Serial.print("\t Core Status:"); 
+  Serial.println(coilIsOpen); 
+
+
+
+   
+ // Logic to decide what to do 
+ if (coilPinState < 200 & !coilIsOpen) //
+ {
+   // Coil is being commanded open, so open it 
+   actuateCoil(0); 
+   coilIsOpen = true;
+ }
+ else if ( (coilPinState > 950) & coilIsOpen )
+ {
+   // Coil is being commanded closed, so close it 
+   actuateCoil(1); 
+   coilIsOpen = false; 
+ }
+
 
 }// end loop 
 
 
 
 // ----------------------------------------------- Functions 
-char getTraffic( ) 
-{
-  // TO DO: Add some resilience here. 
-  if ( Serial.available() ) 
-  {
-    return Serial.read(); 
-  }
-  else
-  {
-    return '0';
-  }
-    
-}
+
 
 void actuateCoil(int Direction) 
 {
@@ -116,12 +114,13 @@ void actuateCoil(int Direction)
   analogWrite(coil_Motor_Speed_Pin, 255);  
 
   // Delay to give the motor a chance to overcome friction and get out of stall
-  delay(800);
+  delay(5
+  00);
 
 
   // Monitor the encoder, when the shaft stalls kill the motor power
   int d_dt = 1000; // the derivative of the motor speed, high number just to get in the loop 
-  while ( d_dt > 420 ) 
+  while ( d_dt > 450 ) 
   {
     // Calculate the derivative of encoder counts 
     int v1 = 10*coilEnc.read();  
@@ -130,7 +129,7 @@ void actuateCoil(int Direction)
     d_dt = abs(v2-v1); 
 
 
-    //Serial.println(d_dt); 
+    Serial.println(d_dt); 
   }
 
   // Debug message

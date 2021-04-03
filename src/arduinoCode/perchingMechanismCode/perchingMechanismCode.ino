@@ -24,18 +24,23 @@
 #define Motor_twoA 2
 #define Motor_twoB 7
 
-// Enocder commands
+// Pin to tell the other Arduino what to do 
+#define coilFlagPin 13
+
+// Encoder object instantiation 
 Encoder coilEnc1(Motor_oneA, Motor_oneB);
 Encoder coilEnc2(Motor_twoA, Motor_twoB);
 
-//Encoder pins
+char message[4] = {'0','0','0','0'};
+int  coilCommand = 0;
 
-char message = '0';
-
+//---------------------------------------------------------------------- setup()
 void setup()
 {
-  // put your setup code here, to run once:
+  // Establish Serial Connection
   Serial.begin(9600);
+  // Ping to odroid what this device is 
+  Serial.print("gripper"); 
 
   // Motor 1
   pinMode(SideoneA, OUTPUT);
@@ -50,46 +55,81 @@ void setup()
   // Enable pin
   pinMode(enablePin, OUTPUT);
 
+  // Coil flag pin
+  pinMode(coilFlagPin, OUTPUT); 
+
+  // Open the core on startup 
+  digitalWrite(coilFlagPin, LOW); 
+
 } // end of Setup
 
+// ---------------------------------------------------------------------- loop()
 void loop()
 {
-  
-
-  actuateCoil(1); 
-  delay(3000); 
-  actuateCoil(0); 
-  delay(3000); 
 
   // // Monitor Serial Line for Commands
-  // message = getTraffic();
+  if (Serial.available() > 3) {
+    getTraffic();
+
+    Serial.print(message);
+  }
 
   // // Perform Motor actions when commands are recieved
-  // if (message == '6')
-  // {
-  //   actuateCoil(1);
-  // }
-  // else if (message == '7')
-  // {
-  //   actuateCoil(0);
-  // }
+  switch (message[3]) 
+  {
+    case '4':
+      actuateCoil(0); break; 
+    case '3':
+      actuateCoil(1); break; 
+    case '2':
+      // Close the Core
+      digitalWrite(A7, HIGH);  
+      break; 
+    case '1':
+      // Open the Core 
+      digitalWrite(A7, LOW); 
+      break; 
+    default: 
+      // Do nothing
+      break;
+  }
+
+  // Reset the message variable
+   message[0] = '0';
+   message[1] = '0';
+   message[2] = '0';
+   message[3] = '0';
 
 } // end of loop
 
+// ---------------------------------------------------------------- getTraffic()
 char getTraffic()
 {
-  // TO DO: Add some resilience here.
-  if (Serial.available())
-  {
-    return Serial.read();
-  }
-  else
-  {
-    return '0';
+
+  // Arduino is expecting the code with "C10" as the first three characters
+  // This should add some resilience in the communication
+  if (Serial.available() > 3) {
+    message[0] = Serial.read();
+    Serial.println(message[0]);
+    if ( message[0] == 'C') {
+      message[1] = Serial.read();
+      Serial.println(message[1]);
+      if ( message[1] == '1') {
+        message[2] = Serial.read();
+        Serial.println(message[2]);
+        if (message[2] == '0'){
+          message[3] = Serial.read();
+          //Serial.println(message[3]);
+          //coilCommand = int(Serial.read());
+
+        }
+      }
+    }
+
   }
 }
 
-// Beginning of Actuate func
+// -------------------------------------------------------------- actuateCoil()
 void actuateCoil(int Direction)
 {
   // Enable the motor controllers
@@ -114,10 +154,10 @@ void actuateCoil(int Direction)
   // Turn the motors on in the respective direction
   digitalWrite(SideoneA, dirA);
   digitalWrite(SideoneB, dirB);
-  analogWrite(Sideone_speed, 200);
+  analogWrite(Sideone_speed, 255);
   digitalWrite(SidetwoA, dirB);
   digitalWrite(SidetwoB, dirA);
-  analogWrite(Sidetwo_speed, 200);
+  analogWrite(Sidetwo_speed, 255);
 
   // Delay to give the motor a chance to overcome friction and get out of stall
   delay(300);
@@ -137,36 +177,26 @@ void actuateCoil(int Direction)
     int vA2 =  10 * coilEnc2.read();
     delay(50);
 
-    // Calculate the derivative of the motors to detect stall 
+    // Calculate the derivative of the motors to detect stall
     d_dt1 = abs(vA1+ (10*coilEnc1.read()) ) / 50;
-    d_dt2 = abs(vA2- (10*coilEnc2.read()) ) / 50; 
-    //Serial.print(d_dt1);
-    //Serial.print("  "); 
-    //Serial.print(d_dt2);
-    //Serial.print("\t"); 
+    d_dt2 = abs(vA2- (10*coilEnc2.read()) ) / 50;
 
     // Proportional controller error calculation
     int error1 = vA1 - vA2;
 
-    // Serial.print(error1); 
-    // Serial.print("\t");
-    // Serial.print(vA1); 
-    // Serial.print("\t");
-    // Serial.print(vA2);
-    // Serial.println(" "); 
-    
-    // Adjust the speed of motor two based on the error and 
-    analogWrite(Sidetwo_speed, 200 - 0.07*error1); 
-    
+
+    // Adjust the speed of motor two based on the error and
+    analogWrite(Sidetwo_speed, 200 - 0.07*error1);
+
   } // end of while loop
 
-  Serial.println("The motor has stalled and exited"); 
+  Serial.println("The motor has stalled and exited");
 
-  // Shut off the motors 
+  // Shut off the motors
   analogWrite(Sideone_speed, 0);
   analogWrite(Sidetwo_speed, 0);
 
   // disable the motor controllers
-  digitalWrite(enablePin, HIGH);  
+  digitalWrite(enablePin, HIGH);
 
-} // end of function
+} //------------------------------------------------------- end of actuateCoil()
