@@ -83,6 +83,8 @@ def status_updater(message):
         core_status.config(text='Closed', fg='red')
 
 
+
+
 def app():
     root = tk.Tk()
     root.title('Hook Controller')
