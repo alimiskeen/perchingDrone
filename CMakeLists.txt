@@ -53,6 +53,8 @@ add_message_files(
   hook_status.msg
   core_command.msg
   hook_command.msg
+  drone_status.msg
+  drone_commands.msg
 )
 
 ## Generate services in the 'srv' folder
