@@ -23,7 +23,7 @@ except:
     vehicle = connect(connection_string, wait_ready=True)
 
 
-def get_drone_status(msg):
+def get_drone_status(msg: drone_status):
     msg.bat_voltage = vehicle.battery.voltage
     msg.armable = vehicle.is_armable
     msg.armed = vehicle.armed
@@ -44,6 +44,7 @@ def get_drone_status(msg):
 
 def status_sender():
     # ros topic
+    print('starting to send drone info')
     pub = rospy.Publisher('drone_status_topic', drone_status, queue_size=10)
     rate = rospy.Rate(2)
     # getting msg
@@ -146,6 +147,8 @@ if __name__ == '__main__':
     status_sending = threading.Thread(target=status_sender)
     status_sending.start()
 
-    get_drone_commands()
+    # get_drone_commands()
+
+    rospy.spin()
 
     vehicle.close()
