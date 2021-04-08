@@ -5,6 +5,7 @@ from pymavlink import mavutil
 from dronekit import connect, VehicleMode, LocationGlobal
 import time
 import os
+import math
 
 
 def change_mode(mode: str):
@@ -97,27 +98,103 @@ def arm_and_takeoff(vhcl, aTargetAltitude):
         time.sleep(1)
 
 
+
+
+
 def land(vhcl):
     pass
 
+
+def get_location_metres(original_location, dNorth, dEast):
+    """
+    Returns a LocationGlobal object containing the latitude/longitude `dNorth` and `dEast` metres from the
+    specified `original_location`. The returned Location has the same `alt` value
+    as `original_location`.
+
+    The function is useful when you want to move the vehicle around specifying locations relative to
+    the current vehicle position.
+    The algorithm is relatively accurate over small distances (10m within 1km) except close to the poles.
+    For more information see:
+    http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+    """
+    earth_radius=6378137.0 #Radius of "spherical" earth
+    #Coordinate offsets in radians
+    dLat = dNorth/earth_radius
+    dLon = dEast/(earth_radius*math.cos(math.pi*original_location.lat/180))
+
+    #New position in decimal degrees
+    newlat = original_location.lat + (dLat * 180/math.pi)
+    newlon = original_location.lon + (dLon * 180/math.pi)
+    return LocationGlobal(newlat, newlon,original_location.alt)
+
+
+def get_distance_metres(aLocation1, aLocation2):
+    """
+    Returns the ground distance in metres between two LocationGlobal objects.
+
+    This method is an approximation, and will not be accurate over large distances and close to the
+    earth's poles. It comes from the ArduPilot test code:
+    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
+    """
+    dlat = aLocation2.lat - aLocation1.lat
+    dlong = aLocation2.lon - aLocation1.lon
+    return math.sqrt((dlat*dlat) + (dlong*dlong)) * 1.113195e5
+
+
+######3
+# def goto(dNorth, dEast, vhcl, gotoFunction=land):
+#     currentLocation = vhcl.location.global_relative_frame
+#     targetLocation = get_location_metres(currentLocation, dNorth, dEast)
+#     targetDistance = get_distance_metres(currentLocation, targetLocation)
+#     gotoFunction(targetLocation)
+#
+#     while (vehicle.mode.name == "GUIDED") and (
+#             get_distance_metres(vehicle.home_location, vehicle.location.global_frame) < radius) and (
+#             vehicle.location.global_relative_frame.alt < alt_limit):
+#         # Stop action if we are no longer in guided mode or outside radius.
+#         remainingDistance = get_distance_metres(vehicle.location.global_frame, targetLocation)
+#
+#         print("Distance to target: ", remainingDistance)
+#         if remainingDistance <= targetDistance * 0.1:  # Just below target, in case of undershoot.
+#             print("Reached target")
+#             break
+
+
+time.sleep(2)
+
+######
 
 
 conn_str = '/dev/ttyACM0'
 vehicle = initialize_drone(conn_str)
 
 print('change the drone mode to loiter')
-change_mode("LOITER")
+change_mode("GUIDED")
 
 arm(vehicle)
 
 print(f'state: {vehicle.system_status.state}')
 time.sleep(5)
 
+vehicle.airspeed = .5  # setting the airspeed to be slow
+
 arm_and_takeoff(vehicle, 2)
 
 print('reached altitude')
 
-time.sleep(10)
+time.sleep(5)
+
+print('going to 2, 2')
+cur_loc = vehicle.location.global_relative_frame
+target_location = get_location_metres(cur_loc, 2, 2)
+vehicle.simple_goto(target_location)
+time.sleep(5)
+cur_loc = vehicle.location.global_relative_frame
+target_location = get_location_metres(cur_loc, -2, -2)
+vehicle.simple_goto(target_location)
+time.sleep(5)
+
+print('going back')
 
 print('now going to land')
 
