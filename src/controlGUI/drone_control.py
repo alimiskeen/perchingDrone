@@ -23,23 +23,23 @@ except:
     vehicle = connect(connection_string, wait_ready=True)
 
 
-def get_drone_status(msg: drone_status):
-    msg.bat_voltage = vehicle.battery.voltage
-    msg.armable = vehicle.is_armable
-    msg.armed = vehicle.armed
-    msg.system_status = vehicle.system_status.state
-    msg.mode = vehicle.mode.name
-    msg.fixed_gps = vehicle.gps_0.fix_type
-    msg.available_gps = vehicle.gps_0.satellites_visible
-    msg.gnd_speed = vehicle.groundspeed
-    msg.air_speed = vehicle.airspeed
-    msg.local_north = vehicle.location.local_frame.north
-    msg.local_east = vehicle.location.local_frame.east
-    msg.local_down = vehicle.location.local_frame.down
-    msg.heading = vehicle.heading
-    msg.x = vehicle.version[0]
-    msg.y = vehicle.version[1]
-    msg.z = vehicle.version[2]
+# def get_drone_status(msg: drone_status):
+#     msg.bat_voltage = vehicle.battery.voltage
+#     msg.armable = vehicle.is_armable
+#     msg.armed = vehicle.armed
+#     msg.system_status = vehicle.system_status.state
+#     msg.mode = vehicle.mode.name
+#     msg.fixed_gps = vehicle.gps_0.fix_type
+#     msg.available_gps = vehicle.gps_0.satellites_visible
+#     msg.gnd_speed = vehicle.groundspeed
+#     msg.air_speed = vehicle.airspeed
+#     msg.local_north = vehicle.location.local_frame.north
+#     msg.local_east = vehicle.location.local_frame.east
+#     msg.local_down = vehicle.location.local_frame.down
+#     msg.heading = vehicle.heading
+#     msg.x = vehicle.version[0]
+#     msg.y = vehicle.version[1]
+#     msg.z = vehicle.version[2]
 
 
 def status_sender():
