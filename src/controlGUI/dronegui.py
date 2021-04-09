@@ -8,7 +8,7 @@ from perchingDrone.msg import drone_commands, drone_status
 drone_command_topic = rospy.Publisher('drone_command_topic', drone_commands, queue_size=10)
 
 root = tk.Tk()
-root.title('Hook Controller')
+root.title('Drone Controller')
 root.geometry('1000x1000')
 
 frame = tk.Frame(root)

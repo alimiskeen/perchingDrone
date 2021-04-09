@@ -33,15 +33,15 @@ def initialize_drone(connection_string: str):
         time.sleep(3)
         vehicle = connect(connection_string, wait_ready=True)
 
-    print('reading GPS signal')
-    while vehicle.gps_0.satellites_visible < 5:
-        print(f'not enough GPS sats: {vehicle.gps_0.satellites_visible}')
-        time.sleep(1)
-
-    print('waiting for the drone to become armable')
-    while not vehicle.is_armable:
-        time.sleep(1)
-        print('drone not yet armable')
+    # print('reading GPS signal')
+    # while vehicle.gps_0.satellites_visible < 5:
+    #     print(f'not enough GPS sats: {vehicle.gps_0.satellites_visible}')
+    #     time.sleep(1)
+    #
+    # print('waiting for the drone to become armable')
+    # while not vehicle.is_armable:
+    #     time.sleep(1)
+    #     print('drone not yet armable')
 
     return vehicle
 
@@ -99,8 +99,6 @@ def arm_and_takeoff(vhcl, aTargetAltitude):
 
 
 
-
-
 def land(vhcl):
     pass
 
@@ -141,6 +139,32 @@ def get_distance_metres(aLocation1, aLocation2):
     return math.sqrt((dlat*dlat) + (dlong*dlong)) * 1.113195e5
 
 
+def print_data(vhcl, print_statement=print):
+    # vehicle is an instance of the Vehicle class
+    print_statement("Autopilot Firmware version: %s" % vhcl.version)
+    print_statement("Autopilot capabilities (supports ftp): %s" % vhcl.capabilities.ftp)
+    print_statement("Global Location: %s" % vhcl.location.global_frame)
+    print_statement("Global Location (relative altitude): %s" % vhcl.location.global_relative_frame)
+    print_statement("Local Location: %s" % vhcl.location.local_frame)  # NED
+    print_statement("Attitude: %s" % vhcl.attitude)
+    print_statement("Velocity: %s" % vhcl.velocity)
+    print_statement("GPS: %s" % vhcl.gps_0)
+    print_statement("Groundspeed: %s" % vhcl.groundspeed)
+    print_statement("Airspeed: %s" % vhcl.airspeed)
+    print_statement("Gimbal status: %s" % vhcl.gimbal)
+    print_statement("Battery: %s" % vhcl.battery)
+    print_statement("EKF OK?: %s" % vhcl.ekf_ok)
+    print_statement("Last Heartbeat: %s" % vhcl.last_heartbeat)
+    print_statement("Rangefinder: %s" % vhcl.rangefinder)
+    print_statement("Rangefinder distance: %s" % vhcl.rangefinder.distance)
+    print_statement("Rangefinder voltage: %s" % vhcl.rangefinder.voltage)
+    print_statement("Heading: %s" % vhcl.heading)
+    print_statement("Is Armable?: %s" % vhcl.is_armable)
+    print_statement("System status: %s" % vhcl.system_status.state)
+    print_statement("Mode: %s" % vhcl.mode.name)  # settable
+    print_statement("Armed: %s" % vhcl.armed)  # settable
+
+
 ######3
 # def goto(dNorth, dEast, vhcl, gotoFunction=land):
 #     currentLocation = vhcl.location.global_relative_frame
@@ -160,55 +184,53 @@ def get_distance_metres(aLocation1, aLocation2):
 #             break
 
 
-time.sleep(2)
-
-######
-
-
 conn_str = '/dev/ttyACM0'
 vehicle = initialize_drone(conn_str)
 
 print('change the drone mode to loiter')
 change_mode("GUIDED")
 
-arm(vehicle)
+# arm(vehicle)
 
 print(f'state: {vehicle.system_status.state}')
-time.sleep(5)
+# time.sleep(5)
 
 vehicle.airspeed = .5  # setting the airspeed to be slow
 
-arm_and_takeoff(vehicle, 2)
-
-print('reached altitude')
-
-time.sleep(5)
-
-print('going to 2, 2')
-cur_loc = vehicle.location.global_relative_frame
-target_location = get_location_metres(cur_loc, 2, 2)
-vehicle.simple_goto(target_location)
-time.sleep(5)
-print('now going back home')
-cur_loc = vehicle.location.global_relative_frame
-target_location = get_location_metres(cur_loc, -2, -2)
-vehicle.simple_goto(target_location)
-time.sleep(5)
+print_data(vehicle)
 
 
-print('going back')
+# arm_and_takeoff(vehicle, 2)
 
-print('now going to land')
+# print('reached altitude')
 
-vehicle.mode = VehicleMode("LAND")
+# time.sleep(5)
 
-print('now we wait till we reach the ground')
-time.sleep(20)
+# print('going to 2, 2')
+# cur_loc = vehicle.location.global_relative_frame
+# target_location = get_location_metres(cur_loc, 2, 2)
+# vehicle.simple_goto(target_location)
+# time.sleep(5)
+# print('now going back home')
+# cur_loc = vehicle.location.global_relative_frame
+# target_location = get_location_metres(cur_loc, -2, -2)
+# vehicle.simple_goto(target_location)
+# time.sleep(5)
 
-print('disarming the drone')
-disarm(vehicle)
+
+# print('going back')
+
+# print('now going to land')
+
+# vehicle.mode = VehicleMode("LAND")
+
+# print('now we wait till we reach the ground')
+# time.sleep(20)
+
+# print('disarming the drone')
+# disarm(vehicle)
 
 # print(vehicle.system_status.state) # good thing to get on the gui
-print(vehicle.system_status.state)
+# print(vehicle.system_status.state)
 
 vehicle.close()
