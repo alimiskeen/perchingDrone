@@ -189,10 +189,12 @@ cur_loc = vehicle.location.global_relative_frame
 target_location = get_location_metres(cur_loc, 2, 2)
 vehicle.simple_goto(target_location)
 time.sleep(5)
+print('now going back home')
 cur_loc = vehicle.location.global_relative_frame
 target_location = get_location_metres(cur_loc, -2, -2)
 vehicle.simple_goto(target_location)
 time.sleep(5)
+
 
 print('going back')
 
