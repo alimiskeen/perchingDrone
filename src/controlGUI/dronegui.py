@@ -232,7 +232,7 @@ if __name__ == '__main__':
 
     setup_buttons()
 
-    status_recieving = threading.Thread(target=drone_status_listener)
-    status_recieving.start()
+    # status_recieving = threading.Thread(target=drone_status_listener)
+    # status_recieving.start()
 
     root.mainloop()

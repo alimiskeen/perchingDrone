@@ -165,6 +165,26 @@ def print_data(vhcl, print_statement=print):
     print_statement("Armed: %s" % vhcl.armed)  # settable
 
 
+def send_ned_velocity(velocity_x, velocity_y, velocity_z, duration):
+    """
+    Move vehicle in direction based on specified velocity vectors.
+    """
+    msg = vehicle.message_factory.set_position_target_local_ned_encode(
+        0,       # time_boot_ms (not used)
+        0, 0,    # target system, target component
+        mavutil.mavlink.MAV_FRAME_LOCAL_NED, # frame
+        0b0000111111000111, # type_mask (only speeds enabled)
+        0, 0, 0, # x, y, z positions (not used)
+        velocity_x, velocity_y, velocity_z, # x, y, z velocity in m/s
+        0, 0, 0, # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
+        0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+
+
+    # send command to vehicle on 1 Hz cycle
+    for x in range(0,duration):
+        vehicle.send_mavlink(msg)
+        time.sleep(1)
+
 ######3
 # def goto(dNorth, dEast, vhcl, gotoFunction=land):
 #     currentLocation = vhcl.location.global_relative_frame
@@ -190,45 +210,44 @@ vehicle = initialize_drone(conn_str)
 print('change the drone mode to loiter')
 change_mode("GUIDED")
 
-# arm(vehicle)
+arm(vehicle)
 
 print(f'state: {vehicle.system_status.state}')
-# time.sleep(5)
+time.sleep(5)
 
-vehicle.airspeed = .5  # setting the airspeed to be slow
+vehicle.airspeed = 1  # setting the airspeed to be slow
 
-print_data(vehicle)
+# print_data(vehicle)
 
 
-# arm_and_takeoff(vehicle, 2)
+arm_and_takeoff(vehicle, 3)
 
-# print('reached altitude')
+print('reached altitude')
 
-# time.sleep(5)
+time.sleep(5)
 
-# print('going to 2, 2')
-# cur_loc = vehicle.location.global_relative_frame
-# target_location = get_location_metres(cur_loc, 2, 2)
-# vehicle.simple_goto(target_location)
-# time.sleep(5)
-# print('now going back home')
-# cur_loc = vehicle.location.global_relative_frame
-# target_location = get_location_metres(cur_loc, -2, -2)
-# vehicle.simple_goto(target_location)
-# time.sleep(5)
 
+print('moving the drone')
+send_ned_velocity(.5, .5, -.5, 3)
+
+time.sleep(5)
+
+print('moving the drone back')
+send_ned_velocity(-.5, -.5, .5, 3)
+
+time.sleep(5)
 
 # print('going back')
 
-# print('now going to land')
+print('now going to land')
 
-# vehicle.mode = VehicleMode("LAND")
+vehicle.mode = VehicleMode("LAND")
 
-# print('now we wait till we reach the ground')
-# time.sleep(20)
+print('now we wait till we reach the ground')
+time.sleep(20)
 
 # print('disarming the drone')
-# disarm(vehicle)
+disarm(vehicle)
 
 # print(vehicle.system_status.state) # good thing to get on the gui
 # print(vehicle.system_status.state)
