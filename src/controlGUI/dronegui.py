@@ -59,35 +59,35 @@ velocities_title = tk.Label(frame, text='v[x, y, z]: [0.0,0.0,0.0]')
 velocities_title.grid(row=14, column=0, padx=10, pady=1)
 
 
-def update_status(data: drone_status):
-    bat_title.config(text=f'Battery = {data.bat_voltage:.2f}v')
+# def update_status(data: drone_status):
+#     bat_title.config(text=f'Battery = {data.bat_voltage:.2f}v')
+#
+#     if data.armable:
+#         armable_title.config(text='Armable')
+#     else:
+#         armable_title.config(text='Not Armable')
+#
+#     if data.armed:
+#         armed_title.config(text='Armed')
+#     else:
+#         armed_title.config(text='Not Armed')
+#
+#     system_status_title.config(text=data.system_status)
+#     mode_title.config(text=data.mode)
+#     fgps_title.config(text=f'Fixed GPS: {data.fixed_gps}')
+#     agps_title.config(text=f'Available GPS: {data.available_gps}')
+#     gnd_speed_title.config(text=f'GND speed: {data.gnd_speed:.2f}')
+#     air_speed_title.config(text=f'AIR speed: {data.air_speed:.2f}')
+#     local_north_title.config(text=f'north: {data.local_north:.2f}')
+#     local_east_title.config(text=f'east: {data.local_east:.2f}')
+#     local_down_title.config(text=f'down: {data.local_down:.2f}')
+#     heading_title.config(text=f'heading: {data.heading}')
+#     velocities_title.config(text=f'v[x, y, z]: [{data.x},{data.y},{data.z}]')
 
-    if data.armable:
-        armable_title.config(text='Armable')
-    else:
-        armable_title.config(text='Not Armable')
 
-    if data.armed:
-        armed_title.config(text='Armed')
-    else:
-        armed_title.config(text='Not Armed')
-
-    system_status_title.config(text=data.system_status)
-    mode_title.config(text=data.mode)
-    fgps_title.config(text=f'Fixed GPS: {data.fixed_gps}')
-    agps_title.config(text=f'Available GPS: {data.available_gps}')
-    gnd_speed_title.config(text=f'GND speed: {data.gnd_speed:.2f}')
-    air_speed_title.config(text=f'AIR speed: {data.air_speed:.2f}')
-    local_north_title.config(text=f'north: {data.local_north:.2f}')
-    local_east_title.config(text=f'east: {data.local_east:.2f}')
-    local_down_title.config(text=f'down: {data.local_down:.2f}')
-    heading_title.config(text=f'heading: {data.heading}')
-    velocities_title.config(text=f'v[x, y, z]: [{data.x},{data.y},{data.z}]')
-
-
-def drone_status_listener():
-    drone_status_topic = rospy.Subscriber('drone_status_topic', drone_status, update_status)
-    rospy.spin()
+# def drone_status_listener():
+#     drone_status_topic = rospy.Subscriber('drone_status_topic', drone_status, update_status)
+#     rospy.spin()
 
 
 # command buttons
