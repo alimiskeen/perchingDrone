@@ -2,8 +2,7 @@
 
 import tkinter as tk
 import rospy
-import threading
-from perchingDrone.msg import drone_commands, drone_status
+
 from std_msgs.msg import String
 
 drone_command_topic = rospy.Publisher('drone_command_topic', String, queue_size=1)

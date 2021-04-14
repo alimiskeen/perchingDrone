@@ -4,7 +4,6 @@ from pymavlink import mavutil
 from dronekit import connect, VehicleMode, LocationGlobal
 import time
 import os
-from perchingDrone.msg import drone_commands
 from std_msgs.msg import String
 
 
@@ -153,7 +152,6 @@ def yaw(angle):
 
 
 def read_commands(data: String):
-    # todo: things with the String
     if data.data == 'arm':
         arm(vehicle)
     elif data.data == 'takeoff':
