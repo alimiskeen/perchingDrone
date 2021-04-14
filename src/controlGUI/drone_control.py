@@ -4,8 +4,8 @@ from pymavlink import mavutil
 from dronekit import connect, VehicleMode, LocationGlobal
 import time
 import os
-import math
 from perchingDrone.msg import drone_commands
+from std_msgs.msg import String
 
 
 def empty_print(string):
@@ -28,16 +28,6 @@ def initialize_drone(connection_string: str, print_statement=empty_print):
         os.system('sudo ./usbpermission.sh')
         time.sleep(3)
         vehicle = connect(connection_string, wait_ready=True)
-
-    # print('reading GPS signal')
-    # while vehicle.gps_0.satellites_visible < 5:
-    #     print(f'not enough GPS sats: {vehicle.gps_0.satellites_visible}')
-    #     time.sleep(1)
-    #
-    # print('waiting for the drone to become armable')
-    # while not vehicle.is_armable:
-    #     time.sleep(1)
-    #     print('drone not yet armable')
 
     return vehicle
 
@@ -69,36 +59,13 @@ def disarm(vhcl, print_method=empty_print):
     print_method("disarmed")
 
 
-# def status_sender():
-#     # ros topic
-#     print('starting to send drone info')
-#     pub = rospy.Publisher('drone_status_topic', drone_status, queue_size=10)
-#     rate = rospy.Rate(2)
-#     # getting msg
-#     while not rospy.is_shutdown():
-#         msg = drone_status()
-#         get_drone_status(msg)
-#         pub.publish(msg)
-#         rate.sleep()
-#
-#
-def change_mode(mode):
-    vehicle.mode = VehicleMode(mode)
-
-
 def arm_drone(arm):
     vehicle.arm()  # Arming my be some other way
 
 
-#
-#
-# def set_airspeed(speed):
-#     vehicle.airspeed = speed
-#
-#
-def take_off(do):
+def take_off(do: bool, alt: float):
     if do:
-        aTargetAltitude = .5
+        aTargetAltitude = alt
         print("Basic pre-arm checks")
         # Don't let the user try to arm until autopilot is ready
         while not vehicle.is_armable:
@@ -148,17 +115,17 @@ def send_ned_velocity(velocity_x, velocity_y, velocity_z, duration):
         0, 0)  # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
 
     # send command to vehicle on 5 Hz cycle
-    for x in range(0, duration * 5):
+    for x in range(0, duration):
         vehicle.send_mavlink(msg)
-        time.sleep(.2)
+        time.sleep(1)
 
 
 def move(fwd, left):  # in m/s
     send_ned_velocity(left, fwd, 0, 1)
 
 
-def rise(dist):
-    send_ned_velocity(0, 0, -dist, 1)
+def rise(vel):
+    send_ned_velocity(0, 0, -vel, 1)
 
 
 def condition_yaw(heading, relative=False):
@@ -185,33 +152,41 @@ def yaw(angle):
         condition_yaw(angle, relative=True)
 
 
-def read_commands(data: drone_commands):
-    # change_mode(data.mode)
-    # arm_drone(data.arm)
-    # set_airspeed(data.airspeed)
-    take_off(data.takeoff)
-    land(data.land)
-    move(data.forward, data.leftward)
-    rise(data.rise)
-    yaw(data.angle)
+def read_commands(data: String):
+    # todo: things with the String
+    if data.data == 'arm':
+        arm(vehicle)
+    elif data.data == 'takeoff':
+        take_off(True, 2)
+    elif data.data == 'stakeoff':
+        take_off(True, .5)
+    elif data.data == 'land':
+        land(True)
+    elif data.data == 'yawleft':
+        yaw(-10)
+    elif data.data == 'yawright':
+        yaw(10)
+    elif data.data == 'forward':
+        move(.3, 0)
+    elif data.data == 'backward':
+        move(-.3, 0)
+    elif data.data == 'left':
+        move(0, .3)
+    elif data.data == 'right':
+        move(0, -.3)
+    elif data.data == 'rise':
+        rise(.3)
+    elif data.data == 'low':
+        rise(-.3)
+    elif data.data == 'disarm':
+        disarm(vehicle)
+    elif data.data == 'brake':
+        change_mode('BRAKE')
 
 
 def get_drone_commands():
-    rospy.Subscriber("drone_command_topic", drone_commands, read_commands)
+    rospy.Subscriber("drone_command_topic", String, read_commands)
     rospy.spin()
-
-
-# if __name__ == '__main__':
-#     rospy.init_node('drone_controller', anonymous=True)
-#
-#     status_sending = threading.Thread(target=status_sender)
-#     status_sending.start()
-#
-#     # get_drone_commands()
-#
-#     rospy.spin()
-#
-#     vehicle.close()
 
 
 ''' main '''

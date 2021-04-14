@@ -4,8 +4,9 @@ import tkinter as tk
 import rospy
 import threading
 from perchingDrone.msg import drone_commands, drone_status
+from std_msgs.msg import String
 
-drone_command_topic = rospy.Publisher('drone_command_topic', drone_commands, queue_size=10)
+drone_command_topic = rospy.Publisher('drone_command_topic', String, queue_size=1)
 
 root = tk.Tk()
 root.title('Drone Controller')
@@ -91,6 +92,7 @@ velocities_title.grid(row=14, column=0, padx=10, pady=1)
 
 
 # command buttons
+
 def setup_buttons():
     takeoff_but = tk.Button(frame, text='Take Off', command=take_off, pady=10, padx=5)
     takeoff_but.grid(row=1, column=1, padx=20, pady=1)
@@ -122,6 +124,15 @@ def setup_buttons():
     rise_but = tk.Button(frame, text='↗', command=rise, pady=10, padx=5)
     rise_but.grid(row=1, column=5, padx=1, pady=1)
 
+    shorttakeoff_but = tk.Button(frame, text='slow Take Off', command=slow_takeoff, pady=10, padx=5)
+    shorttakeoff_but.grid(row=1, column=6, padx=1, pady=1)
+
+    disarm_but =  tk.Button(frame, text='Disarm', command=disarm, pady=10, padx=5)
+    disarm_but.grid(row=3, column=6, padx=1, pady=1)
+
+    brake_but = tk.Button(frame, text='BRAKE', command=brake, pady=10, padx=5)
+    brake_but.grid(row=2, column=6, padx=1, pady=1)
+
     low_but = tk.Button(frame, text='↘', command=low, pady=10, padx=5)
     low_but.grid(row=3, column=5, padx=1, pady=1)
 
@@ -135,96 +146,76 @@ def setup_buttons():
     airspeed_title.grid(row=5, column=1, padx=10, pady=5)
     airspeed_entry = tk.Entry(frame)  # TODO: add a command
     airspeed_entry.grid(row=5, column=2, padx=10, pady=5, columnspan=4)
-    airspeed_entry.insert(0, '0.5')
+    airspeed_entry.insert(0, '1.0')
 
+
+def slow_takeoff():
+    msg = 'stakeoff'
+    drone_command_topic.publish(msg)
 
 def take_off():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.takeoff = True
+    msg = 'takeoff'
     drone_command_topic.publish(msg)
 
 
 def land():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.land = True
+    msg = 'land'
     drone_command_topic.publish(msg)
 
 
 def yaw_left():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.angle = -5
+    msg = 'yawleft'
     drone_command_topic.publish(msg)
 
 
 def yaw_right():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.angle = 5
+    msg = 'yawright'
     drone_command_topic.publish(msg)
 
 
 def fwd():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.forward = .2
+    msg = 'forward'
     drone_command_topic.publish(msg)
 
 
 def bwd():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.forward = -.2
+    msg = 'backward'
     drone_command_topic.publish(msg)
 
 
 def left():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.leftward = .2
+    msg = 'left'
     drone_command_topic.publish(msg)
 
 
 def right():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.angle = -.2
+    msg = 'right'
     drone_command_topic.publish(msg)
 
 
 def rise():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.rise = .2
+    msg = 'rise'
     drone_command_topic.publish(msg)
 
 
 def low():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.rise = -.2
+    msg = 'low'
     drone_command_topic.publish(msg)
 
 
 def arm():
-    msg = drone_commands()
-    default_msg(msg)
-    msg.arm = True
+    msg = 'arm'
     drone_command_topic.publish(msg)
 
 
-def default_msg(msg: drone_commands):
-    msg.mode = 'GUIDED'
-    msg.arm = False
-    msg.airspeed = 0.5
-    msg.takeoff = False
-    msg.land = False
-    msg.forward = 0.0
-    msg.leftward = 0.0
-    msg.rise = 0.0
-    msg.angle = 0
+def disarm():
+    msg = 'disarm'
+    drone_command_topic.publish(msg)
+
+
+def brake():
+    msg = 'brake'
+    drone_command_topic.publish(msg)
 
 
 if __name__ == '__main__':
