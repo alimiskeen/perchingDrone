@@ -1,11 +1,12 @@
 from pyPS4Controller.controller import Controller  # requires pip3/pip install pyPS4Controller
-from dronekit import connect, VehicleMode, LocationGlobal
+from drone import Drone
 
 
 class DroneController(Controller):
 
-    def __init__(self, **kwargs):
+    def __init__(self, vehicle: Drone, **kwargs):
         Controller.__init__(self, **kwargs)
+        self.vehicle = vehicle
         # init connection to the drone
 
     def on_x_press(self):
@@ -14,6 +15,10 @@ class DroneController(Controller):
 
     def on_square_press(self):
         """ Let the drone land """
+        pass
+
+    def on_circle_press(self):
+        """ arm or disarm drone"""
         pass
 
     def on_R1_press(self):
