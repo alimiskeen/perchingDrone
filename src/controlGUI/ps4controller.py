@@ -1,5 +1,5 @@
 from pyPS4Controller.controller import Controller  # requires pip3/pip install pyPS4Controller
-# from dronekit import connect, VehicleMode, LocationGlobal
+from dronekit import connect, VehicleMode, LocationGlobal
 
 
 class DroneController(Controller):
