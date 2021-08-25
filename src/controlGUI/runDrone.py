@@ -7,6 +7,7 @@ def controller_connected():
 
 
 if __name__ == '__main__':
-    drone = Drone("localhost")  # change this string to actual address
-    controller = DroneController(drone, interface="/dev/input/js0", connecting_using_ds4drv=False)
+    drn = Drone("localhost")  # change this string to actual address
+
+    controller = DroneController(drn, interface="/dev/input/js0", connecting_using_ds4drv=False)
     controller.listen(on_connect=controller_connected)

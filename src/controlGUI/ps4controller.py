@@ -6,8 +6,7 @@ class DroneController(Controller):
 
     def __init__(self, vehicle: Drone, **kwargs):
         Controller.__init__(self, **kwargs)
-        self.vehicle = vehicle
-        # init connection to the drone
+        self.drone = vehicle  # initialized drone
 
     def on_x_press(self):
         """ Let the drone take off """
@@ -19,7 +18,10 @@ class DroneController(Controller):
 
     def on_circle_press(self):
         """ arm or disarm drone"""
-        pass
+        if self.drone.vehicle.armed:
+            self.drone.disarm_drone()
+        else:
+            self.drone.arm_drone()
 
     def on_R1_press(self):
         """ Open the hook """
@@ -51,6 +53,13 @@ class DroneController(Controller):
     def on_R3_right(self, value):
         pass
 
+    def on_R3_x_at_rest(self):
+        pass
+
+    def on_R3_y_at_rest(self):
+        pass
+
+
     """ All the methods to control the left joystick """
 
     def on_L3_down(self, value):
@@ -65,7 +74,8 @@ class DroneController(Controller):
     def on_L3_right(self, value):
         pass
 
+    def on_L3_x_at_rest(self):
+        pass
 
-if __name__ == '__main__':
-    ctrl = DroneController(interface="/dev/input/js0", connecting_using_ds4drv=False)
-    ctrl.listen(timeout=60)
+    def on_L3_y_at_rest(self):
+        pass
