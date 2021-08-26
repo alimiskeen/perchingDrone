@@ -8,8 +8,6 @@ class Drone:
 
     def __init__(self, address: str):
         self.address_string = address
-        self.vehicle = connect(self.address_string, wait_ready=True)  # TODO: change this later to none
-
         self._connect_to_drone()
 
     def _connect_to_drone(self):
