@@ -97,4 +97,4 @@ class Drone:
         self.vehicle.send_mavlink(msg)
 
     def emergency_break(self):
-        self.vehicle.mode = VehicleMode("Break")
+        self.vehicle.mode = VehicleMode("BREAK")
