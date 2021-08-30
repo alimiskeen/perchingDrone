@@ -56,7 +56,7 @@ class Drone:
             time.sleep(.1)
 
     def land(self):
-        self.vehicle.mode = VehicleMode("Land")  # maybe this is enough
+        self.vehicle.mode = VehicleMode("LAND")  # maybe this is enough
         # last_altitude = self.vehicle.location.global_relative_frame.alt
         # current_altitude = self.vehicle.location.global_relative_frame.alt
         # while True:
