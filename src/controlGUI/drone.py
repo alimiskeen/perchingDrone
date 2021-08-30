@@ -56,17 +56,17 @@ class Drone:
             time.sleep(.1)
 
     def land(self):
-        self.vehicle.mode = VehicleMode("Land")
-        last_altitude = self.vehicle.location.global_relative_frame.alt
-        current_altitude = self.vehicle.location.global_relative_frame.alt
-        while True:
-            if current_altitude < 0.1:
-                break
-            time.sleep(1)  # TODO: is this right?
-            current_altitude = self.vehicle.location.global_relative_frame.alt
-            if abs(current_altitude - last_altitude) < .05:
-                break
-            last_altitude = self.vehicle.location.global_relative_frame.alt
+        self.vehicle.mode = VehicleMode("Land")  # maybe this is enough
+        # last_altitude = self.vehicle.location.global_relative_frame.alt
+        # current_altitude = self.vehicle.location.global_relative_frame.alt
+        # while True:
+        #     if current_altitude < 0.1:
+        #         break
+        #     time.sleep(1)  # TODO: is this right?
+        #     current_altitude = self.vehicle.location.global_relative_frame.alt
+        #     if abs(current_altitude - last_altitude) < .05:
+        #         break
+        #     last_altitude = self.vehicle.location.global_relative_frame.alt
 
     def move(self, x_velocity: float, y_velocity: float, z_velocity: float):
         msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
@@ -95,3 +95,6 @@ class Drone:
             0, 0, 0)  # param 5 ~ 7 not used
         # send command to vehicle
         self.vehicle.send_mavlink(msg)
+
+    def emergency_break(self):
+        self.vehicle.mode = VehicleMode("Break")

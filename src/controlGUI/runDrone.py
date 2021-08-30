@@ -2,7 +2,6 @@ import time
 
 from drone import Drone
 from ps4controller import DroneController
-from pyPS4Controller.controller import Controller
 
 
 def controller_connected():
