@@ -63,7 +63,7 @@ class TerminalControl:
         print('emergency break')
 
     def yaw_left(self):
-        self.drone.yaw(-20)
+        self.drone.yaw(340)
         print('yaw left')
 
     def yaw_right(self):
