@@ -19,23 +19,23 @@ if __name__ == '__main__':
     drn = Drone("/dev/ttyACM0")
     print('connected to the drone')
 
-    drn.arm_drone()
+    # drn.arm_drone()
 
-    drn.takeoff(2)
+    # drn.takeoff(2)
 
-    drn.yaw(180)
+    # drn.yaw(180)
 
-    time.sleep(5)
+    # time.sleep(5)
 
-    drn.yaw(-180)
+    # drn.yaw(-180)
 
-    time.sleep(5)
+    # time.sleep(5)
 
-    drn.land()
+    # drn.land()
 
-    time.sleep(5)
+    # time.sleep(5)
 
-    drn.disarm_drone()
+    # drn.disarm_drone()
 
-    # ctrl = TerminalControl(drn)
-    # ctrl.listen()
+    ctrl = TerminalControl(drn)
+    ctrl.listen() # there is a problem with the negative yaw
