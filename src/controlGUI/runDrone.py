@@ -50,23 +50,23 @@ def on_close():
 if __name__ == '__main__':
     signal(SIGINT, on_close)
 
-    # print('connecting to the drone')
-    # drn = Drone("/dev/ttyACM0")
-    # print('connected to the drone')
+    print('connecting to the drone')
+    drn = Drone("/dev/ttyACM0")
+    print('connected to the drone')
 
     ard = setupserialconnection()
 
-    if ard is None:
-        exit(-1)
+    # if ard is None:
+    #     exit(-1)
+    #
+    # send_to_arduino('C104', ard)
+    #
+    # time.sleep(5)
+    #
+    # send_to_arduino('C103', ard)
+    #
+    # ard.close()
 
-    send_to_arduino('C104', ard)
-
-    time.sleep(5)
-
-    send_to_arduino('C103', ard)
-
-    ard.close()
-
-    # ctrl = TerminalControl(drn, ard)
-    # print('listening to the terminal commands')
-    # ctrl.listen()
+    ctrl = TerminalControl(drn, ard)
+    print('listening to the terminal commands')
+    ctrl.listen()
