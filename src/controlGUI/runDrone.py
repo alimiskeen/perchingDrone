@@ -42,7 +42,7 @@ def send_to_arduino(order: str, connection: serial.Serial):
     connection.write(message)
 
 
-def on_close():
+def on_close(signal_recieved, frame):
     ard.close()
     exit(0)
 
