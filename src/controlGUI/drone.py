@@ -2,6 +2,11 @@ from dronekit import connect, VehicleMode
 from pymavlink import mavutil
 import os
 import time
+import serial
+import serial.tools.list_ports_linux
+import time
+from signal import signal, SIGINT
+from sys import exit
 
 
 class Drone:

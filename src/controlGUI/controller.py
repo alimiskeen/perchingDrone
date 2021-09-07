@@ -6,7 +6,7 @@ import threading
 from std_msgs.msg import String
 
 
-def sendMessageToArduino (message):
+def sendMessageToArduino(message):
     pub = rospy.Publisher('arduinocommands', String, queue_size=10)
     pub.publish(message)
 
@@ -44,7 +44,6 @@ def close_hook():
     global status_changed
     # send arduino command
     sendMessageToArduino('C104')
-
 
     print('close hook')  # remove this later
     is_hook_open = False
@@ -114,4 +113,3 @@ if __name__ == '__main__':
 
     # sending status to gui thread
     status_sender()
-

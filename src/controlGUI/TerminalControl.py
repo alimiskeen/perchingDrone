@@ -1,5 +1,6 @@
 import time
 from drone import Drone
+import serial
 
 
 def _command_string():
@@ -10,11 +11,15 @@ def _command_string():
            '      x: hook,                      v: core'
 
 
+def send_to_arduino(order: str, connection: serial.Serial):
+    message = bytes(order, 'utf-8')
+    connection.write(message)
+
+
 class TerminalControl:
 
-    def __init__(self, vehicle: Drone):
+    def __init__(self, vehicle: Drone, connection: serial.Serial):
         self.drone = vehicle
-        self.is_armed = False
         self.options = {'t': self.takeoff,
                         'l': self.land,
                         'o': self.arm,
@@ -27,9 +32,11 @@ class TerminalControl:
                         'd': self.right,
                         'r': self.rise_up,
                         'f': self.rise_down,
-                        'x': None,
+                        'x': self.toggle_hook,
                         'v': None,
                         }
+        self.arduino = connection
+        self.hook_open = True
 
     def listen(self):
         while True:
@@ -49,13 +56,11 @@ class TerminalControl:
         print('landing')
 
     def arm(self):
-        if not self.is_armed:
+        if not self.drone.vehicle.armed:
             self.drone.arm_drone()
-            self.is_armed = True
             print('armed')
         else:
             self.drone.disarm_drone()
-            self.is_armed = False
             print('disarmed')
 
     def emergency(self):
@@ -105,3 +110,11 @@ class TerminalControl:
         time.sleep(1)
         self.drone.move(0.0, 0.0, 0.0)
         print('moved downward')
+
+    def toggle_hook(self):
+        if self.hook_open:
+            send_to_arduino('C104', self.arduino)
+            self.hook_open = False
+        else:
+            send_to_arduino('C103', self.arduino)
+            self.hook_open = True
