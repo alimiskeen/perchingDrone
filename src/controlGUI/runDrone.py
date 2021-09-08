@@ -1,9 +1,5 @@
-import time
-
 from drone import Drone
-from ps4controller import DroneController
 from TerminalControl import TerminalControl
-
 import serial
 import serial.tools.list_ports_linux
 import time
@@ -55,17 +51,6 @@ if __name__ == '__main__':
     print('connected to the drone')
 
     ard = setupserialconnection()
-
-    # if ard is None:
-    #     exit(-1)
-    #
-    # send_to_arduino('C104', ard)
-    #
-    # time.sleep(5)
-    #
-    # send_to_arduino('C103', ard)
-    #
-    # ard.close()
 
     ctrl = TerminalControl(drn, ard)
     print('listening to the terminal commands')

@@ -33,7 +33,7 @@ class TerminalControl:
                         'r': self.rise_up,
                         'f': self.rise_down,
                         'x': self.toggle_hook,
-                        'v': None,
+                        'v': None,  # not connected because the core mechanism doesn't currently work
                         }
         self.arduino = connection
         self.hook_open = True
@@ -100,13 +100,13 @@ class TerminalControl:
         print('moved rightward')
 
     def rise_up(self):
-        self.drone.move(0.0, 0.0, 0.5)
+        self.drone.move(0.0, 0.0, -0.5)
         time.sleep(1)
         self.drone.move(0.0, 0.0, 0.0)
         print('moved upward')
 
     def rise_down(self):
-        self.drone.move(0.0, 0.0, -0.5)
+        self.drone.move(0.0, 0.0, 0.5)
         time.sleep(1)
         self.drone.move(0.0, 0.0, 0.0)
         print('moved downward')
